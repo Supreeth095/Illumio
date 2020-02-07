@@ -16,15 +16,27 @@ public class Firewall_class implements Firewall_Interface {
     public boolean accept_packet(String direction, String protocol, int port, String ip_address) {
         //String variable to store each row in the firewall rules file
         String each_line = "";
+        boolean first_row=true;
+
 
 
         try (BufferedReader br = new BufferedReader(new FileReader(absolute_path_to_csv_file))) {
 
             //Reading each line in the rules file
             while ((each_line = br.readLine()) != null) {
+                //for the bug that adds leading spaces to the beginning of the first line
+                if(first_row) {
+                    if(each_line.charAt(0)!='u' && each_line.charAt(0)!='t'){
+                        each_line=each_line.substring(1,each_line.length());
+                        
+                    }
+                    first_row=false;
+                }
+                
 
                 // store the current record's rule parameters
                 String[] each_firewall_rule = each_line.split(",");
+                
 
 
                 //Check if the given direction matches with the current row's rule's direction. If not go to the next row in the CSV.
