@@ -28,13 +28,13 @@ public class Firewall_class implements Firewall_Interface {
 
 
                 //Check if the given direction matches with the current row's rule's direction. If not go to the next row in the CSV.
-                if(!(each_firewall_rule[0].equals(direction))){
+                if(!(each_firewall_rule[0].charAt(0)==direction.charAt(0))){
                     continue;
                 }
 
                 //If check of direction is matched, then the control for the code reaches here. Else it loops back to the next row in the csv
                 //Check if the given protocol matches with the current row's rule's protocol. If not go to the next row in the CSV.
-                if(!(each_firewall_rule[1].equals(protocol))){
+                if(!(each_firewall_rule[1].charAt(0)==protocol..charAt(0))){
                     continue;
                 }
 
