@@ -59,4 +59,8 @@ However, if the leading space issue is there, i have added a small if condition 
    All the new variables created are temporary and space complexity is O(1) as the variables get destroyed once control come out of the if construct. 
    
 
-
+Personal preference ranking : 
+I am interested in all 3 teams. Hoever this is my ranking of preference. 
+1.Data Team
+2.Platform team
+3.Policy team
