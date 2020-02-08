@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 
 //Firewall_class implements the interface
 public class Firewall_class implements Firewall_Interface {
@@ -13,7 +16,7 @@ public class Firewall_class implements Firewall_Interface {
     }
 
     @Override
-    public boolean accept_packet(String direction, String protocol, int port, String ip_address) {
+    public boolean accept_packet(String direction, String protocol, int port, String ip_address) throws UnknownHostException{
         //String variable to store each row in the firewall rules file
         String each_line = "";
         boolean first_row=true;
@@ -28,15 +31,15 @@ public class Firewall_class implements Firewall_Interface {
                 if(first_row) {
                     if(each_line.charAt(0)!='u' && each_line.charAt(0)!='t'){
                         each_line=each_line.substring(1,each_line.length());
-                        
+
                     }
                     first_row=false;
                 }
-                
+
 
                 // store the current record's rule parameters
                 String[] each_firewall_rule = each_line.split(",");
-                
+
 
 
                 //Check if the given direction matches with the current row's rule's direction. If not go to the next row in the CSV.
@@ -65,11 +68,11 @@ public class Firewall_class implements Firewall_Interface {
                 }
                 //code for a range of ports check
                 else {
-                        ports_range=each_firewall_rule[2].split("-");
-                        if(port<Integer.parseInt(ports_range[0]) || port>Integer.parseInt(ports_range[1]) ){
-                            continue;
-                        }
+                    ports_range=each_firewall_rule[2].split("-");
+                    if(port<Integer.parseInt(ports_range[0]) || port>Integer.parseInt(ports_range[1]) ){
+                        continue;
                     }
+                }
 
 
                 //If check of direction and protocol and ports is matched, then the control for the code reaches here. Else it loops back to check the next row in the csv
@@ -91,42 +94,36 @@ public class Firewall_class implements Firewall_Interface {
                     String[] octets= new String[2];
                     octets= each_firewall_rule[3].split("-");
 
-                    //Stores the lower IP as an array of String octets
-                    String[] first_octet= new String[4];
-                    first_octet=octets[0].split(".");
+                    long ipLo = ipToLong(InetAddress.getByName(octets[0]));
+                    long ipHi = ipToLong(InetAddress.getByName(octets[1]));
+                    long ipToTest = ipToLong(InetAddress.getByName(ip_address));
 
-                    //Stores the higher IP as an array of String octets
-                    String[] second_octet= new String[4];
-                    second_octet=octets[1].split(".");
-
-
-                    //Stores the given IP as an array of String octets
-                    String[] ip_address_octect= new String[4];
-                    ip_address_octect=ip_address.split(".");
-
-                    //compare if current octet falls in the range of the first and second octet.
-                    //If not, go to the next row in the csv
-
-                    if((Integer.parseInt(ip_address_octect[0]) < Integer.parseInt(first_octet[0]) ||Integer.parseInt(ip_address_octect[0]) >Integer.parseInt(second_octet[0]) )
-                        ||(Integer.parseInt(ip_address_octect[1]) < Integer.parseInt(first_octet[1]) || Integer.parseInt(ip_address_octect[1]) >Integer.parseInt(second_octet[1]) )
-                            || (Integer.parseInt(ip_address_octect[2]) < Integer.parseInt(first_octet[2]) ||Integer.parseInt(ip_address_octect[2]) >Integer.parseInt(second_octet[2]) )
-                            || (Integer.parseInt(ip_address_octect[3]) < Integer.parseInt(first_octet[3]) ||Integer.parseInt(ip_address_octect[3]) >Integer.parseInt(second_octet[3]) )){
+                    if(ipToTest < ipLo || ipToTest > ipHi)
                         continue;
-                    }
-
-
-
                 }
+
+
+
 
                 //If all of these 4 checks are matched, then the control for the code reaches here.
                 return true;
 
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         //If All 4 checks are never matched in the rules file, then the control for the code reaches here.
         return false;
+    }
+
+    public static long ipToLong(InetAddress ip) {
+        byte[] octets = ip.getAddress();
+        long result = 0;
+        for (byte octet : octets) {
+            result <<= 8;
+            result |= octet & 0xff;
+        }
+        return result;
     }
 }
