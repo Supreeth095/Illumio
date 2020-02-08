@@ -1,6 +1,4 @@
 # Illumio challenge
-Started: 2pm EST
-End: 3:30pm EST
 
 
 The Firewall_class implements Firewall_Interface.
